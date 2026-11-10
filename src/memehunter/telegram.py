@@ -22,7 +22,7 @@ class TelegramNotifier:
             "risk:unknown_liquidity": "liquidité indisponible",
             "risk:very_low_liquidity": "liquidité très faible",
             "risk:low_liquidity": "liquidité faible",
-            "risk:very_low_activity": "activité très faible",
+            "risk:very_low_activity": "activité très faible ou données manquantes",
             "risk:sell_pressure": "pression vendeuse",
             "risk:high_valuation_to_liquidity": "valorisation élevée vs liquidité",
             "risk:unknown_valuation_ratio": "ratio valorisation/liquidité inconnu",

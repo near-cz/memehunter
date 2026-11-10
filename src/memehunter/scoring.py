@@ -1,12 +1,15 @@
 """Transparent heuristic scoring; never an investment recommendation."""
 from .models import Candidate, Post
+
 KEYWORDS = {
     "launch": ("launch", "launched", "fair launch", "pump.fun", "pumpfun"),
     "meme": ("meme", "memecoin", "meme coin", "ticker"),
     "momentum": ("trending", "viral", "everywhere", "community", "everyone"),
 }
+ONCHAIN_SOURCES = {"dexscreener", "geckoterminal"}
+
 def score_post(post: Post) -> Candidate:
-    if post.source == "dexscreener":
+    if post.source in ONCHAIN_SOURCES:
         return score_market_signal(post)
     text = post.text.lower()
     engagement = post.like_count + 2 * post.repost_count + post.reply_count + post.quote_count
@@ -26,6 +29,7 @@ def score_post(post: Post) -> Candidate:
     if post.repost_count + post.quote_count >= 20:
         score += 10; reasons.append("propagation:visible")
     return Candidate(post, min(100, score), tuple(reasons or ["weak_signal"]))
+
 def score_market_signal(post: Post) -> Candidate:
     score, reasons = 0, []
     liquidity, volume = post.liquidity_usd, post.volume_24h_usd

@@ -4,6 +4,7 @@ import sqlite3
 from pathlib import Path
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from .risk import risk_status
 
 def _database_path() -> str:
     return os.getenv("DATABASE_PATH", "data/memehunter.sqlite3")
@@ -41,7 +42,10 @@ def opportunities(limit: int = Query(default=50, ge=1, le=100)):
             "reasons": r[9].split(" | ") if r[9] else [], "source": r[10],
             "token_address": r[11], "token_symbol": r[12], "token_name": r[13],
             "price_usd": r[14], "liquidity_usd": r[15], "volume_24h_usd": r[16],
-            "market_cap_usd": r[17], "buys_24h": r[18], "sells_24h": r[19]} for r in rows]
+            "market_cap_usd": r[17], "buys_24h": r[18], "sells_24h": r[19],
+            "risk_flags": [part for part in (r[9] or "").split(" | ") if part.startswith("risk:")],
+            "risk_status": risk_status([part for part in (r[9] or "").split(" | ") if part.startswith("risk:")])
+                if r[10] in {"dexscreener", "geckoterminal"} else "unknown"} for r in rows]
         return {"items": items, "total": total}
     finally:
         connection.close()

@@ -64,6 +64,6 @@ class DexScreenerClient:
                 token_symbol=symbol, token_name=name, price_usd=float(pair.get("priceUsd") or 0),
                 liquidity_usd=float((pair.get("liquidity") or {}).get("usd") or 0),
                 volume_24h_usd=float((pair.get("volume") or {}).get("h24") or 0),
-                market_cap_usd=float(pair.get("marketCap") or pair.get("fdv") or 0),
+                market_cap_usd=float(pair.get("marketCap") or 0),
                 buys_24h=int(h24.get("buys") or 0), sells_24h=int(h24.get("sells") or 0)))
         return posts

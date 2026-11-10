@@ -124,3 +124,31 @@ def test_geckoterminal_skips_pool_when_token_mint_metadata_is_missing():
         "included": [],
     }
     assert GeckoTerminalClient._parse_pool_response(payload, 10) == []
+
+
+def test_telegram_market_alert_includes_geckoterminal_token_link_and_mint():
+    from memehunter.models import Candidate
+    from memehunter.telegram import TelegramNotifier
+
+    post = Post("geckoterminal:pool123", "Meme <script> ($MEME)", "", "2026-11-10T10:00:00Z",
+        0, 0, 0, 0, source="geckoterminal",
+        post_url="https://www.geckoterminal.com/solana/pools/pool123",
+        token_address="MintABC123", token_symbol="MEME", token_name="Meme <script>",
+        liquidity_usd=12000, volume_24h_usd=80000, buys_24h=350, sells_24h=120)
+    message = TelegramNotifier.format_candidate(Candidate(post, 72, ("liquidity:strong",)))
+    assert "Voir le token / pool" in message
+    assert "https://www.geckoterminal.com/solana/pools/pool123" in message
+    assert "<code>MintABC123</code>" in message
+    assert "&lt;script&gt;" in message
+    assert "<script>" not in message
+
+
+def test_telegram_alert_does_not_link_untrusted_url():
+    from memehunter.models import Candidate
+    from memehunter.telegram import TelegramNotifier
+
+    post = Post("x1", "Hello", "", "2026-11-10T10:00:00Z", 1, 0, 0, 0,
+        post_url='javascript:alert("x")')
+    message = TelegramNotifier.format_candidate(Candidate(post, 50, ()))
+    assert 'href="javascript:' not in message
+    assert "Voir le post source" in message

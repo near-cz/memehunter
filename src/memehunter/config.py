@@ -23,7 +23,7 @@ class Settings:
     poll_interval_seconds: int = 180
     min_score: int = 45
     database_path: str = "data/memehunter.sqlite3"
-    search_query: str = '(memecoin OR meme coin OR "fair launch") lang:en -is:retweet'
+    search_query: str = '(meme OR viral OR trending OR funny OR community) lang:en -is:retweet -is:reply'
     source_mode: str = "onchain"
     max_tokens_per_cycle: int = 12
     max_daily_launches: int = 5

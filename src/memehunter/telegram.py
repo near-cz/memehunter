@@ -53,6 +53,7 @@ class TelegramNotifier:
             "dexscreener.com", "www.geckoterminal.com", "geckoterminal.com", "x.com", "twitter.com"
         } else ""
         link = f'<a href="{html.escape(safe_url, quote=True)}">{source_label}</a>' if safe_url else source_label
+        disclaimer = ("Analyse limitée aux données marché publiques ; pas de vérification honeypot, holders, mint/freeze authority ni garantie de sécurité." if is_market else "Signal social exploratoire ; aucune vérification on-chain ou de sécurité n’est effectuée.")
         return (
             f"🧠 <b>MemeHunter — signal détecté</b>\n"
             f"Score heuristique : <b>{candidate.score}/100</b>\n\n"
@@ -60,7 +61,7 @@ class TelegramNotifier:
             f"{details}"
             f"Signaux : {html.escape(reasons)}\n"
             f"{link}\n\n"
-            f"<i>Analyse limitée aux données marché publiques ; pas de vérification honeypot, holders, mint/freeze authority ni garantie de sécurité. Pas un conseil financier.</i>"
+            f"<i>{html.escape(disclaimer)} Pas un conseil financier.</i>"
         )
 
     async def send_candidate(self, candidate: Candidate) -> None:

@@ -55,7 +55,7 @@ In another terminal run `memehunter-api`, then serve `apps/dashboard` with `pyth
 
 **Already automatic:** scanner polling, candidate scoring, database deduplication and Telegram alert delivery (when Telegram is configured).
 
-**Not implemented yet:** publishing promotional posts to X/Telegram channels, generating and publishing token artwork, creating Pump.fun tokens, trading, or managing Creator Fees. The current Telegram integration sends alerts to the configured chat; it does not publish public launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
+**Not implemented yet:** composing full promotional launch campaigns, publishing to X, generating and publishing token artwork, creating Pump.fun tokens, trading, or managing Creator Fees. Telegram signal alerts can be delivered to a private chat or posted directly into a channel where the bot is an administrator; they are scanner alerts, not automatic token-launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
 
 No score guarantees safety, volume, profit or Creator Fees. Public indexers are incomplete and may contain stale or promoted data. Always verify token mint, liquidity, authority settings and holder distribution independently.
 

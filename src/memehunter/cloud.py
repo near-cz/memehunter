@@ -19,21 +19,23 @@ scanner_task: asyncio.Task | None = None
 async def dashboard_basic_auth(request, call_next):
     username = os.getenv("DASHBOARD_USERNAME", "")
     password = os.getenv("DASHBOARD_PASSWORD", "")
-    if username and password:
-        import base64
-        import secrets
-        from starlette.responses import Response
-        header = request.headers.get("authorization", "")
-        supplied_user = supplied_password = ""
-        if header.startswith("Basic "):
-            try:
-                decoded = base64.b64decode(header[6:], validate=True).decode("utf-8")
-                supplied_user, supplied_password = decoded.split(":", 1)
-            except (ValueError, UnicodeDecodeError):
-                pass
-        if not (secrets.compare_digest(supplied_user, username) and
-                secrets.compare_digest(supplied_password, password)):
-            return Response(status_code=401, headers={"WWW-Authenticate": 'Basic realm="MemeHunter"'})
+    from starlette.responses import Response
+    if not username or not password:
+        log.error("Dashboard authentication is not configured; refusing unauthenticated access")
+        return Response("Dashboard authentication is not configured.", status_code=503)
+    import base64
+    import secrets
+    header = request.headers.get("authorization", "")
+    supplied_user = supplied_password = ""
+    if header.startswith("Basic "):
+        try:
+            decoded = base64.b64decode(header[6:], validate=True).decode("utf-8")
+            supplied_user, supplied_password = decoded.split(":", 1)
+        except (ValueError, UnicodeDecodeError):
+            pass
+    if not (secrets.compare_digest(supplied_user, username) and
+            secrets.compare_digest(supplied_password, password)):
+        return Response(status_code=401, headers={"WWW-Authenticate": 'Basic realm="MemeHunter"'})
     return await call_next(request)
 
 @api_app.on_event("startup")

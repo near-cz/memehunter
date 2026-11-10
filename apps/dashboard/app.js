@@ -37,7 +37,12 @@
       const values = [label || 'Signal public', item.score + '/100', activity, riskLabel(item), ['dexscreener', 'geckoterminal'].includes(item.source) ? 'Voir le token' : 'Ouvrir le post'];
       values.forEach((value, index) => {
         const td = document.createElement('td');
-        if (index === 3) {\n          const risk = document.createElement('span');\n          risk.className = 'risk-pill risk-' + (item.risk_status || 'unknown');\n          risk.textContent = value;\n          td.appendChild(risk);\n        } else if (index === 4 && item.url) {
+        if (index === 3) {
+          const risk = document.createElement('span');
+          risk.className = 'risk-pill risk-' + (item.risk_status || 'unknown');
+          risk.textContent = value;
+          td.appendChild(risk);
+        } else if (index === 4 && item.url) {
           const link = document.createElement('a');
           link.href = item.url;
           link.target = '_blank';

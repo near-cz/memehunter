@@ -23,17 +23,16 @@ async def run() -> None:
         while True:
             try:
                 posts, newest_id = await source.search(settings.search_query, since_id=store.get_cursor())
-                # Process oldest-first so Telegram alerts are chronological.
                 for post in reversed(posts):
                     if not store.is_new(post.post_id):
                         continue
                     candidate = score_post(post)
-                    store.mark_seen(post.post_id, candidate.score, post.created_at)
+                    store.mark_seen(candidate)
                     if candidate.score >= settings.min_score:
                         await notifier.send_candidate(candidate)
                         log.info("Alert sent for post %s (score=%s)", post.post_id, candidate.score)
                 store.set_cursor(newest_id)
-            except Exception as exc:  # keep the worker alive; never log credentials or full request headers
+            except Exception as exc:
                 log.warning("Polling cycle failed: %s", type(exc).__name__)
             await asyncio.sleep(settings.poll_interval_seconds)
     finally:

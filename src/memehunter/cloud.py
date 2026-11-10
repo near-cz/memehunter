@@ -53,7 +53,7 @@ async def stop_scanner():
             pass
         scanner_task = None
 
-dashboard_dir = Path(__file__).resolve().parents[2] / "apps" / "dashboard"
+dashboard_dir = Path(__file__).resolve().parent / "static"
 if dashboard_dir.exists():
     api_app.mount("/", StaticFiles(directory=str(dashboard_dir), html=True), name="dashboard")
 

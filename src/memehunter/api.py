@@ -61,15 +61,18 @@ def opportunities(limit: int = Query(default=50, ge=1, le=100)):
 @app.get("/api/v1/creator/drafts")
 def creator_drafts(limit: int = Query(default=20, ge=1, le=50)):
     """Read-only list of generated creator drafts awaiting human review."""
+    daily_limit = max(0, min(5, int(os.getenv("MAX_DAILY_LAUNCHES", "5"))))
     connection = _connect_readonly()
     if connection is None:
-        return {"items": [], "total": 0, "daily_limit": 5}
+        return {"items": [], "total": 0, "created_today": 0, "daily_limit": daily_limit,
+                "launch_enabled": False}
     try:
         tables = {row[0] for row in connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         )}
         if "creator_drafts" not in tables:
-            return {"items": [], "total": 0, "daily_limit": 5}
+            return {"items": [], "total": 0, "created_today": 0, "daily_limit": daily_limit,
+                    "launch_enabled": False}
         total = connection.execute("SELECT COUNT(*) FROM creator_drafts").fetchone()[0]
         rows = connection.execute(
             "SELECT payload, status, created_at FROM creator_drafts "
@@ -84,8 +87,8 @@ def creator_drafts(limit: int = Query(default=20, ge=1, le=50)):
         today = connection.execute(
             "SELECT COUNT(*) FROM creator_drafts WHERE date(created_at) = date('now')"
         ).fetchone()[0]
-        return {"items": items, "total": total, "created_today": today, "daily_limit": 5,
-                "launch_enabled": False}
+        return {"items": items, "total": total, "created_today": today,
+                "daily_limit": daily_limit, "launch_enabled": False}
     finally:
         connection.close()
 

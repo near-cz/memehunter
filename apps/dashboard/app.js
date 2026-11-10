@@ -1,6 +1,6 @@
 /* Dashboard client: source-neutral, read-only MemeHunter API. */
 (() => {
-  const API = window.MEMEHUNTER_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API = window.MEMEHUNTER_API_URL || '/api/v1';
   const filters = document.querySelectorAll('.filter');
   const empty = document.getElementById('empty-state');
   const rows = document.getElementById('opportunity-rows');
@@ -22,7 +22,7 @@
     for (const item of visible) {
       const tr = document.createElement('tr');
       const label = item.token_symbol ? item.token_name + ' ($' + item.token_symbol + ')' : (item.text || '').slice(0, 100);
-      const activity = item.source === 'dexscreener'
+      const activity = ['dexscreener', 'geckoterminal'].includes(item.source)
         ? '$' + Math.round(item.volume_24h_usd || 0).toLocaleString('en-US') + ' vol. 24h'
         : (item.likes + item.reposts + item.replies + item.quotes) + ' interactions';
       const values = [label || 'Signal public', item.score + '/100', activity, item.source === 'dexscreener' ? 'Voir le token' : 'Ouvrir le post'];

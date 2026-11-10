@@ -59,8 +59,11 @@ async def run() -> None:
                     except Exception as exc:
                         log.warning("GeckoTerminal unavailable: %s", type(exc).__name__)
                 if use_x and x_source:
-                    x_posts, newest_id = await x_source.search(settings.search_query, since_id=store.get_cursor())
-                    posts.extend(x_posts)
+                    try:
+                        x_posts, newest_id = await x_source.search(settings.search_query, since_id=store.get_cursor())
+                        posts.extend(x_posts)
+                    except Exception as exc:
+                        log.warning("X search unavailable: %s", type(exc).__name__)
                 for post in posts:
                     is_new = store.is_new(post.post_id)
                     candidate = score_post(post)

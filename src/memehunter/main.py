@@ -43,6 +43,7 @@ async def run() -> None:
         while True:
             try:
                 posts = []
+                newest_id = None
                 if use_dex:
                     try:
                         posts.extend(await dex.discover())
@@ -56,13 +57,15 @@ async def run() -> None:
                 if use_x and x_source:
                     x_posts, newest_id = await x_source.search(settings.search_query, since_id=store.get_cursor())
                     posts.extend(x_posts)
-                    store.set_cursor(newest_id)
                 for post in posts:
                     is_new = store.is_new(post.post_id)
                     candidate = score_post(post)
                     if is_new and candidate.score >= settings.min_score and notifier:
                         store.enqueue_notification(candidate)
                     store.mark_seen(candidate)
+                # Advance the X cursor only after every fetched post has been persisted.
+                if use_x and newest_id:
+                    store.set_cursor(newest_id)
                 if notifier:
                     await _deliver_pending(store, notifier)
                 log.info("Cycle complete: %s public signals", len(posts))

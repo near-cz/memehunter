@@ -48,3 +48,20 @@ a{color:#c8e8a1;text-decoration:none}a:hover{color:#e4ffc1;text-decoration:under
 @keyframes ambient-drift{from{transform:translate3d(-3%,0,0) scale(.92)}to{transform:translate3d(5%,7%,0) scale(1.08)}}
 @media(max-width:650px){.ambient{filter:blur(65px);opacity:.11}.metric:hover,.panel:hover{transform:none}.main{animation-duration:.55s}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Refined motion + interactive glass reflections */
+.welcome{isolation:isolate}
+.welcome:before{content:"";position:absolute;z-index:-1;top:-80%;left:-35%;width:42%;height:260%;transform:rotate(24deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.075),transparent);animation:glass-sweep 11s ease-in-out 1.4s infinite}
+.metric{animation:card-rise .65s cubic-bezier(.2,.8,.2,1) both}
+.metric:nth-child(1){animation-delay:.08s}.metric:nth-child(2){animation-delay:.16s}.metric:nth-child(3){animation-delay:.24s}.metric:nth-child(4){animation-delay:.32s}
+.content-grid>.panel{animation:card-rise .75s .25s cubic-bezier(.2,.8,.2,1) both}
+.service-row{transition:background .25s,padding .25s;border-radius:9px;padding-left:7px;padding-right:7px}
+.service-row:hover{background:rgba(255,255,255,.035);padding-left:12px;padding-right:12px}
+tbody tr{animation:row-arrive .38s cubic-bezier(.2,.8,.2,1) both}
+tbody tr:nth-child(2){animation-delay:.035s}tbody tr:nth-child(3){animation-delay:.07s}tbody tr:nth-child(4){animation-delay:.105s}tbody tr:nth-child(5){animation-delay:.14s}tbody tr:nth-child(6){animation-delay:.175s}
+.risk-pill{transition:filter .2s,transform .2s}
+.risk-pill:hover{filter:brightness(1.15);transform:translateY(-1px)}
+@keyframes glass-sweep{0%,68%,100%{left:-45%;opacity:0}74%{opacity:1}88%{left:125%;opacity:0}}
+@keyframes card-rise{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes row-arrive{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.welcome:before{animation:none}.metric,.content-grid>.panel,tbody tr{animation:none}}

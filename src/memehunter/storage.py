@@ -1,6 +1,11 @@
-"""SQLite persistence for source-neutral opportunities and cursor."""
+"""SQLite persistence for opportunities and durable notification delivery."""
+import json
 import sqlite3
 from pathlib import Path
+
+from .models import Candidate, Post
+
+
 class Store:
     def __init__(self, path: str) -> None:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -10,8 +15,18 @@ class Store:
             post_id TEXT PRIMARY KEY, score INTEGER NOT NULL, created_at TEXT NOT NULL
         )""")
         self.db.execute("CREATE TABLE IF NOT EXISTS app_state (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+        self.db.execute("""CREATE TABLE IF NOT EXISTS notifications (
+            post_id TEXT PRIMARY KEY,
+            payload TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            attempts INTEGER NOT NULL DEFAULT 0,
+            last_error TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            sent_at TEXT
+        )""")
         self._migrate()
         self.db.commit()
+
     def _migrate(self) -> None:
         columns = {row["name"] for row in self.db.execute("PRAGMA table_info(seen_posts)")}
         additions = {
@@ -27,8 +42,50 @@ class Store:
         for name, definition in additions.items():
             if name not in columns:
                 self.db.execute(f"ALTER TABLE seen_posts ADD COLUMN {name} {definition}")
+
     def is_new(self, post_id: str) -> bool:
         return self.db.execute("SELECT 1 FROM seen_posts WHERE post_id = ?", (post_id,)).fetchone() is None
+
+    def enqueue_notification(self, candidate: Candidate) -> bool:
+        payload = json.dumps({
+            "post": candidate.post.__dict__,
+            "score": candidate.score,
+            "reasons": list(candidate.reasons),
+        }, ensure_ascii=False)
+        cursor = self.db.execute(
+            "INSERT OR IGNORE INTO notifications(post_id, payload) VALUES (?, ?)",
+            (candidate.post.post_id, payload),
+        )
+        self.db.commit()
+        return cursor.rowcount == 1
+
+    def pending_notifications(self, limit: int = 100) -> list[Candidate]:
+        rows = self.db.execute(
+            "SELECT payload FROM notifications WHERE status = 'pending' ORDER BY created_at, post_id LIMIT ?",
+            (limit,),
+        ).fetchall()
+        candidates = []
+        for row in rows:
+            payload = json.loads(row["payload"])
+            candidates.append(Candidate(
+                post=Post(**payload["post"]),
+                score=int(payload["score"]),
+                reasons=tuple(payload["reasons"]),
+            ))
+        return candidates
+
+    def mark_notification_sent(self, post_id: str) -> None:
+        self.db.execute(
+            """UPDATE notifications SET status='sent', sent_at=CURRENT_TIMESTAMP,
+            last_error='' WHERE post_id=?""", (post_id,))
+        self.db.commit()
+
+    def record_notification_failure(self, post_id: str, error: str) -> None:
+        self.db.execute(
+            """UPDATE notifications SET attempts=attempts+1, last_error=?
+            WHERE post_id=? AND status='pending'""", (error[:500], post_id))
+        self.db.commit()
+
     def mark_seen(self, candidate) -> None:
         post = candidate.post
         self.db.execute(
@@ -51,12 +108,15 @@ class Store:
              post.token_symbol, post.token_name, post.price_usd, post.liquidity_usd,
              post.volume_24h_usd, post.market_cap_usd, post.buys_24h, post.sells_24h))
         self.db.commit()
+
     def get_cursor(self) -> str | None:
         row = self.db.execute("SELECT value FROM app_state WHERE key = 'x_since_id'").fetchone()
         return row[0] if row else None
+
     def set_cursor(self, value: str | None) -> None:
         if value:
             self.db.execute("INSERT INTO app_state(key, value) VALUES ('x_since_id', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (value,))
             self.db.commit()
+
     def close(self) -> None:
         self.db.close()

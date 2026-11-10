@@ -26,6 +26,7 @@ class Settings:
     search_query: str = '(memecoin OR meme coin OR "fair launch") lang:en -is:retweet'
     source_mode: str = "onchain"
     max_tokens_per_cycle: int = 12
+    max_daily_launches: int = 5
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -40,13 +41,12 @@ class Settings:
             search_query=os.getenv("X_SEARCH_QUERY", cls.search_query),
             source_mode=os.getenv("SOURCE_MODE", "onchain").lower(),
             max_tokens_per_cycle=max(1, min(20, int(os.getenv("MAX_TOKENS_PER_CYCLE", "12")))),
+            max_daily_launches=max(0, min(5, int(os.getenv("MAX_DAILY_LAUNCHES", "5")))),
         )
 
     def validate(self) -> None:
         allowed = {"dexscreener", "geckoterminal", "onchain", "x", "both", "all"}
         if self.source_mode not in allowed:
             raise RuntimeError("SOURCE_MODE must be dexscreener, geckoterminal, onchain, x, both, or all")
-        if self.source_mode in {"x", "both", "all"} and not self.x_api_bearer_token:
-            raise RuntimeError("This SOURCE_MODE includes X and requires a local X_API_BEARER_TOKEN")
         if bool(self.telegram_bot_token) != bool(self.telegram_chat_id):
             raise RuntimeError("Set both Telegram variables or leave both empty")

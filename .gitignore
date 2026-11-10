@@ -1,0 +1,34 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+config.local.*
+*.pem
+*.key
+*.p12
+wallet*
+*seed*
+*mnemonic*
+
+# Dependencies
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+
+# Build and runtime output
+dist/
+build/
+.next/
+coverage/
+.cache/
+logs/
+*.log
+
+# Local databases and editor files
+*.sqlite
+*.db
+.DS_Store
+.idea/
+.vscode/

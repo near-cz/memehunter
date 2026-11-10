@@ -26,7 +26,7 @@ def market_risk_flags(post: Post) -> tuple[str, ...]:
 
     if post.market_cap_usd > 0 and post.liquidity_usd > 0:
         if post.market_cap_usd / post.liquidity_usd > 100:
-            flags.append("risk:high_fdv_to_liquidity")
+            flags.append("risk:high_valuation_to_liquidity")
     else:
         flags.append("risk:unknown_valuation_ratio")
 
@@ -40,7 +40,7 @@ def risk_status(flags: tuple[str, ...] | list[str]) -> str:
     flags = tuple(flags)
     if any(flag in flags for flag in ("risk:very_low_liquidity", "risk:sell_pressure")):
         return "high"
-    if any(flag in flags for flag in ("risk:low_liquidity", "risk:high_fdv_to_liquidity",
+    if any(flag in flags for flag in ("risk:low_liquidity", "risk:high_valuation_to_liquidity",
                                       "risk:very_low_activity")):
         return "watch"
     if any(flag.startswith("risk:unknown_") for flag in flags):

@@ -20,6 +20,7 @@
       <nav>
         <a class="nav-link active" href="#overview"><span>◫</span> Vue générale</a>
         <a class="nav-link" href="#opportunities"><span>⌕</span> Opportunités</a>
+        <a class="nav-link" href="#creator"><span>✦</span> Creator Studio</a>
         <a class="nav-link" href="#activity"><span>↗</span> Activité</a>
       </nav>
       <div class="sidebar-bottom">
@@ -58,11 +59,18 @@
           <div class="panel-heading"><div><div class="eyebrow">SYSTÈME</div><h3>État des services</h3></div><span class="pulse"></span></div>
           <div class="service-row"><span class="service-icon">◈</span><div><b>DexScreener</b><small>Source publique · sans clé API</small></div><span class="dot green"></span></div>
           <div class="service-row"><span class="service-icon">➤</span><div><b>Telegram</b><small>À configurer</small></div><span class="dot amber"></span></div>
-          <div class="service-row"><span class="service-icon">𝕏</span><div><b>X (optionnel)</b><small>Connexion API non requise</small></div><span class="dot gray"></span></div>
+          <div class="service-row"><span class="service-icon">𝕏</span><div><b>X Scanner</b><small>Token développeur à configurer</small></div><span class="dot gray"></span></div>
           <div class="service-row"><span class="service-icon">◫</span><div><b>Dashboard</b><small>Interface cloud / locale</small></div><span class="dot green"></span></div>
           <div class="divider"></div>
-          <div class="limit-card"><div class="limit-head"><b>Limite de lancement</b><span>0 / 5</span></div><div class="progress"><span></span></div><small>Le scanner détecte et envoie les alertes qualifiées. Aucun lancement de token n’est activé.</small></div>
+          <div class="limit-card"><div class="limit-head"><b>File Creator Studio</b><span id="launch-count">0 / 5</span></div><div class="progress"><span id="launch-progress"></span></div><small>Maximum cinq fiches X par jour. Préparation uniquement : aucun token n’est publié automatiquement.</small></div>
         </aside>
+      </section>
+      <section class="creator-section panel" id="creator">
+        <div class="panel-heading"><div><div class="eyebrow">CREATOR & PUBLISHER</div><h3>File de lancement</h3></div><span class="count" id="creator-count">En attente des signaux X</span></div>
+        <p class="creator-intro">Les meilleurs posts X deviennent des concepts de memecoins à vérifier : nom, ticker, description et lien source. Chaque fiche reste en attente de validation.</p>
+        <div class="creator-empty" id="creator-empty">Aucune fiche pour le moment. Configure l’accès X pour commencer la détection.</div>
+        <div class="creator-grid" id="creator-drafts"></div>
+        <div class="creator-note"><span>◎</span> Aucun achat initial, aucune signature et aucune publication on-chain dans cette version. Vérifie les droits sur les noms et visuels avant toute utilisation.</div>
       </section>
       <footer><span>MEMEHUNTER © 2026</span><span>READ-ONLY MODE · NO TRANSACTIONS</span></footer>
     </main>

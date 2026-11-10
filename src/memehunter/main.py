@@ -46,10 +46,11 @@ async def run() -> None:
                 for post in posts:
                     is_new = store.is_new(post.post_id)
                     candidate = score_post(post)
-                    store.mark_seen(candidate)
                     if is_new and candidate.score >= settings.min_score and notifier:
+                        # Persist only after successful delivery so transient Telegram errors retry next cycle.
                         await notifier.send_candidate(candidate)
                         log.info("Alert sent for %s item %s (score=%s)", post.source, post.post_id, candidate.score)
+                    store.mark_seen(candidate)
                 log.info("Cycle complete: %s public signals", len(posts))
             except Exception as exc:
                 log.warning("Polling cycle failed: %s", type(exc).__name__)

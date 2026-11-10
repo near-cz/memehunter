@@ -2,6 +2,13 @@
 
 MemeHunter is a Solana memecoin discovery system: public market scanning, explainable scoring, a mobile-friendly dashboard and optional Telegram alerts.
 
+## Product roadmap: two core pillars
+
+- **MemeHunter** discovers Solana memecoin opportunities and highlights market risks.
+- **Creator & Publisher** is the next major build: prepare a token brand and metadata, review a launch, publish through a wallet-approved flow, then prepare and manage launch communications. The staged implementation and security requirements are documented in [docs/creator-publisher.md](docs/creator-publisher.md).
+
+Creator & Publisher is not implemented yet; the current application remains read-only.
+
 ## Current capabilities
 
 - **Default sources: DexScreener + GeckoTerminal public APIs**, no X account or paid API key required.

@@ -20,6 +20,9 @@ async def dashboard_basic_auth(request, call_next):
     username = os.getenv("DASHBOARD_USERNAME", "")
     password = os.getenv("DASHBOARD_PASSWORD", "")
     from starlette.responses import Response
+    # Render's health probe must remain reachable without browser credentials.
+    if request.url.path == "/api/v1/health":
+        return await call_next(request)
     if not username or not password:
         log.error("Dashboard authentication is not configured; refusing unauthenticated access")
         return Response("Dashboard authentication is not configured.", status_code=503)

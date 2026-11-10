@@ -80,7 +80,7 @@ def test_extreme_market_cap_to_liquidity_ratio_is_penalized():
         0, 0, 0, 0, source="dexscreener", market_cap_usd=2_000_000,
         liquidity_usd=5_000, volume_24h_usd=30_000, buys_24h=80, sells_24h=20)
     candidate = score_post(token)
-    assert "risk:high_fdv_to_liquidity" in candidate.reasons
+    assert "risk:high_valuation_to_liquidity" in candidate.reasons
     assert candidate.score < 50
 
 

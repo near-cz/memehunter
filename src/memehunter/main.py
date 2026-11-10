@@ -37,7 +37,9 @@ async def run() -> None:
     modes = settings.source_mode
     use_dex = modes in {"dexscreener", "onchain", "both", "all"}
     use_gecko = modes in {"geckoterminal", "onchain", "both", "all"}
-    use_x = modes in {"x", "both", "all"}
+    use_x = modes in {"x", "both", "all"} and x_source is not None
+    if modes in {"x", "both", "all"} and x_source is None:
+        log.warning("X scanning is enabled in SOURCE_MODE but X_API_BEARER_TOKEN is not configured; X polling is paused")
     log.info("MemeHunter scanner started (read-only; source_mode=%s)", modes)
     try:
         while True:
@@ -62,8 +64,11 @@ async def run() -> None:
                 for post in posts:
                     is_new = store.is_new(post.post_id)
                     candidate = score_post(post)
-                    if is_new and candidate.score >= settings.min_score and notifier:
-                        store.enqueue_notification(candidate)
+                    if is_new and candidate.score >= settings.min_score:
+                        if post.source == "x":
+                            store.enqueue_creator_draft(candidate, settings.max_daily_launches)
+                        if notifier:
+                            store.enqueue_notification(candidate)
                     store.mark_seen(candidate)
                 # Advance the X cursor only after every fetched post has been persisted.
                 if use_x and newest_id:

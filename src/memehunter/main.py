@@ -1,6 +1,7 @@
 """Polling loop for read-only trend discovery; it never signs Solana transactions."""
 import asyncio
 import logging
+
 from .config import Settings
 from .scoring import score_post
 from .sources.dexscreener import DexScreenerClient
@@ -11,6 +12,19 @@ from .telegram import TelegramNotifier
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("memehunter")
+
+
+async def _deliver_pending(store: Store, notifier: TelegramNotifier) -> None:
+    for candidate in store.pending_notifications():
+        post_id = candidate.post.post_id
+        try:
+            await notifier.send_candidate(candidate)
+            store.mark_notification_sent(post_id)
+            log.info("Telegram alert delivered for %s item %s", candidate.post.source, post_id)
+        except Exception as exc:
+            store.record_notification_failure(post_id, type(exc).__name__)
+            log.warning("Telegram delivery failed for %s (%s); queued for retry", post_id, type(exc).__name__)
+
 
 async def run() -> None:
     settings = Settings.from_env()
@@ -47,10 +61,10 @@ async def run() -> None:
                     is_new = store.is_new(post.post_id)
                     candidate = score_post(post)
                     if is_new and candidate.score >= settings.min_score and notifier:
-                        # Persist only after successful delivery so transient Telegram errors retry next cycle.
-                        await notifier.send_candidate(candidate)
-                        log.info("Alert sent for %s item %s (score=%s)", post.source, post.post_id, candidate.score)
+                        store.enqueue_notification(candidate)
                     store.mark_seen(candidate)
+                if notifier:
+                    await _deliver_pending(store, notifier)
                 log.info("Cycle complete: %s public signals", len(posts))
             except Exception as exc:
                 log.warning("Polling cycle failed: %s", type(exc).__name__)
@@ -58,8 +72,10 @@ async def run() -> None:
     finally:
         store.close()
 
+
 def main() -> None:
     asyncio.run(run())
+
 
 if __name__ == "__main__":
     main()

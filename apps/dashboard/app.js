@@ -113,7 +113,7 @@
         ? Math.round(opportunities.reduce((sum, item) => sum + item.score, 0) / opportunities.length) + '/100' : '—');
       const status = document.querySelector('.top-actions .status');
       if (status) status.textContent = health.status === 'ok'
-        ? (health.x_configured ? 'MemeHunter connecté · X actif' : 'MemeHunter connecté · X à configurer')
+        ? (health.x_configured ? 'MemeHunter connecté · X configuré' : 'MemeHunter connecté · X à configurer')
         : 'API indisponible';
       render(document.querySelector('.filter.active')?.dataset.filter || 'all');
       renderDrafts(drafts);

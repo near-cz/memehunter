@@ -55,6 +55,8 @@ def score_market_signal(post: Post) -> Candidate:
         score += 5; reasons.append("activity:early")
     if post.buys_24h > post.sells_24h and trades >= 20:
         score += 10; reasons.append("flow:buys_above_sells")
+    if not reasons:
+        reasons.append("insufficient_market_signal")
     flags = market_risk_flags(post)
     if "risk:high_fdv_to_liquidity" in flags:
         score -= 10

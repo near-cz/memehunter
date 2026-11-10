@@ -17,12 +17,13 @@ Creator & Publisher is a first-class product pillar beside MemeHunter's discover
 
 ## Implementation phases
 
-### Phase A — Creator workspace (no wallet required)
-- Add a dedicated Creator & Publisher area to the dashboard.
-- Draft editor for name, ticker, description, links and image.
-- Metadata validation and launch checklist.
-- Save drafts locally/server-side without creating transactions.
-- Campaign copy generator/templates with manual review.
+### Phase A — Creator workspace (partially implemented; no wallet required)
+- [x] Add a dedicated Creator Studio area to the dashboard.
+- [x] Generate review-only concept drafts from qualifying new X posts: suggested name, ticker, neutral description, score and source link.
+- [x] Persist drafts in SQLite and expose a read-only API endpoint.
+- [x] Enforce a maximum of five new draft records per UTC day (configurable from zero to five).
+- [ ] Add editable draft fields, image upload/generation, metadata validation and a launch checklist.
+- [ ] Add reviewed campaign copy/templates with manual approval.
 
 ### Phase B — Metadata and wallet connection
 - Add a supported metadata pinning adapter configured with server-side secrets.
@@ -54,6 +55,10 @@ Creator & Publisher is a first-class product pillar beside MemeHunter's discover
 - Record transaction signatures, actual network fees and launch outcomes.
 - Do not promise creator-fee revenue; show only verifiable payouts and clearly labelled estimates.
 - Do not enable automated trading or artificial volume/engagement.
+
+## Current implementation boundary
+
+The current Creator Studio queue is a research/drafting aid only. It does not download or reuse post images, generate artwork, create metadata uploads, connect a wallet, build or sign transactions, create tokens, publish posts, or calculate Creator Fees. X scanning requires a valid X API bearer token; without it, the on-chain scanner remains active and X polling is paused.
 
 ## Pump.fun integration note (verified 10 November 2026)
 

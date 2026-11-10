@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: memehunter
+    runtime: python
+    plan: starter
+    buildCommand: pip install .
+    startCommand: uvicorn memehunter.cloud:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    disk:
+      name: memehunter-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SOURCE_MODE
+        value: onchain
+      - key: DATABASE_PATH
+        value: /var/data/memehunter.sqlite3
+      - key: POLL_INTERVAL_SECONDS
+        value: "180"
+      - key: MIN_OPPORTUNITY_SCORE
+        value: "45"
+      - key: MAX_TOKENS_PER_CYCLE
+        value: "12"
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: DASHBOARD_USERNAME
+        value: admin
+      - key: DASHBOARD_PASSWORD
+        generateValue: true
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false

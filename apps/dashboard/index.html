@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="MemeHunter — tableau de bord de veille memecoin Solana">
+  <title>MemeHunter — Dashboard</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="MemeHunter accueil">
+        <span class="brand-mark">M</span><span>meme<span class="muted">hunter</span></span>
+      </a>
+      <div class="side-label">WORKSPACE</div>
+      <nav>
+        <a class="nav-link active" href="#overview"><span>◫</span> Vue générale</a>
+        <a class="nav-link" href="#opportunities"><span>⌕</span> Opportunités</a>
+        <a class="nav-link" href="#activity"><span>↗</span> Activité</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="connection"><span class="dot amber"></span><div><b>Mode initial</b><small>Sources non connectées</small></div></div>
+        <small class="version">MEMEHUNTER · MVP 0.1</small>
+      </div>
+    </aside>
+
+    <main class="main" id="overview">
+      <header class="topbar">
+        <div><div class="eyebrow">SOLANA / INTELLIGENCE</div><h1>Vue générale</h1></div>
+        <div class="top-actions"><span class="status"><i class="dot amber"></i> En attente de configuration</span><button class="avatar" aria-label="Profil">MH</button></div>
+      </header>
+
+      <section class="welcome">
+        <div><div class="eyebrow">TABLEAU DE BORD</div><h2>Repère les tendances <em>avant les autres.</em></h2><p>Surveillance des signaux publics, scoring et suivi des opportunités.</p></div>
+        <div class="chain-pill"><span class="solana-mark">≋</span> SOLANA</div>
+      </section>
+
+      <section class="metrics" aria-label="Indicateurs">
+        <article class="metric"><div class="metric-head">OPPORTUNITÉS DÉTECTÉES <span>⌕</span></div><strong id="metric-total">—</strong><small>En attente de données X</small></article>
+        <article class="metric"><div class="metric-head">SCORE MOYEN <span>◈</span></div><strong id="metric-score">—</strong><small>Sur 100 points</small></article>
+        <article class="metric"><div class="metric-head">LANCEMENTS DU JOUR <span>↗</span></div><strong id="metric-launches">0 <i>/ 5</i></strong><small>Limite quotidienne configurée</small></article>
+        <article class="metric"><div class="metric-head">CREATOR FEES <span>◎</span></div><strong id="metric-fees">—</strong><small>Aucun revenu estimé sans données vérifiées</small></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel opportunities" id="opportunities">
+          <div class="panel-heading"><div><div class="eyebrow">DÉTECTION EN TEMPS RÉEL</div><h3>Dernières opportunités</h3></div><span class="count" id="opportunity-count">0 résultat</span></div>
+          <div class="filters"><button class="filter active" data-filter="all">Toutes</button><button class="filter" data-filter="high">Score ≥ 70</button><button class="filter" data-filter="new">Récentes</button></div>
+          <div class="empty-state" id="empty-state"><div class="empty-icon">⌕</div><b>Aucune opportunité pour le moment</b><p>Les signaux apparaîtront ici lorsque l'API X sera configurée et que le scanner aura commencé à analyser les posts.</p></div>
+          <div class="table-wrap"><table><thead><tr><th>SIGNAL</th><th>SCORE</th><th>ENGAGEMENT</th><th>SOURCE</th></tr></thead><tbody id="opportunity-rows"></tbody></table></div>
+        </article>
+
+        <aside class="panel side-panel" id="activity">
+          <div class="panel-heading"><div><div class="eyebrow">SYSTÈME</div><h3>État des services</h3></div><span class="pulse"></span></div>
+          <div class="service-row"><span class="service-icon">𝕏</span><div><b>Scanner X</b><small>À configurer</small></div><span class="dot amber"></span></div>
+          <div class="service-row"><span class="service-icon">➤</span><div><b>Telegram</b><small>À configurer</small></div><span class="dot amber"></span></div>
+          <div class="service-row"><span class="service-icon">◎</span><div><b>Solana</b><small>Non connecté</small></div><span class="dot gray"></span></div>
+          <div class="service-row"><span class="service-icon">◫</span><div><b>Dashboard</b><small>Interface locale</small></div><span class="dot green"></span></div>
+          <div class="divider"></div>
+          <div class="limit-card"><div class="limit-head"><b>Limite de lancement</b><span>0 / 5</span></div><div class="progress"><span></span></div><small>Maximum prévu par jour. Les lancements automatiques restent désactivés dans ce MVP.</small></div>
+        </aside>
+      </section>
+      <footer><span>MEMEHUNTER © 2026</span><span>READ-ONLY MODE · NO TRANSACTIONS</span></footer>
+    </main>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

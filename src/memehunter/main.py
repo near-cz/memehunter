@@ -4,26 +4,42 @@ import logging
 from .config import Settings
 from .scoring import score_post
 from .sources.dexscreener import DexScreenerClient
+from .sources.geckoterminal import GeckoTerminalClient
 from .sources.x_api import XApiClient
 from .storage import Store
 from .telegram import TelegramNotifier
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("memehunter")
+
 async def run() -> None:
     settings = Settings.from_env()
     settings.validate()
     store = Store(settings.database_path)
     notifier = TelegramNotifier(settings.telegram_bot_token, settings.telegram_chat_id) if settings.telegram_bot_token else None
     dex = DexScreenerClient(max_tokens=settings.max_tokens_per_cycle)
+    gecko = GeckoTerminalClient(max_pools=settings.max_tokens_per_cycle)
     x_source = XApiClient(settings.x_api_bearer_token) if settings.x_api_bearer_token else None
-    log.info("MemeHunter scanner started (read-only; source_mode=%s)", settings.source_mode)
+    modes = settings.source_mode
+    use_dex = modes in {"dexscreener", "onchain", "both", "all"}
+    use_gecko = modes in {"geckoterminal", "onchain", "both", "all"}
+    use_x = modes in {"x", "both", "all"}
+    log.info("MemeHunter scanner started (read-only; source_mode=%s)", modes)
     try:
         while True:
             try:
                 posts = []
-                if settings.source_mode in {"dexscreener", "both"}:
-                    posts.extend(await dex.discover())
-                if settings.source_mode in {"x", "both"} and x_source:
+                if use_dex:
+                    try:
+                        posts.extend(await dex.discover())
+                    except Exception as exc:
+                        log.warning("DexScreener unavailable: %s", type(exc).__name__)
+                if use_gecko:
+                    try:
+                        posts.extend(await gecko.discover())
+                    except Exception as exc:
+                        log.warning("GeckoTerminal unavailable: %s", type(exc).__name__)
+                if use_x and x_source:
                     x_posts, newest_id = await x_source.search(settings.search_query, since_id=store.get_cursor())
                     posts.extend(x_posts)
                     store.set_cursor(newest_id)
@@ -40,7 +56,9 @@ async def run() -> None:
             await asyncio.sleep(settings.poll_interval_seconds)
     finally:
         store.close()
+
 def main() -> None:
     asyncio.run(run())
+
 if __name__ == "__main__":
     main()

@@ -37,13 +37,15 @@ class GeckoTerminalClient:
         quote = included.get(quote_ref, {})
         base_attrs = base.get("attributes") or {}
         quote_attrs = quote.get("attributes") or {}
-        quote_symbol = (quote_attrs.get("symbol") or "").upper()
-        if quote_symbol in {"SOL", "WSOL", "USDC", "USDT", "USDS"} and base_attrs:
-            token = base_attrs
+        quote_symbols = {"SOL", "WSOL", "USDC", "USDT", "USDS"}
+        base_is_quote_asset = (base_attrs.get("symbol") or "").upper() in quote_symbols
+        quote_is_quote_asset = (quote_attrs.get("symbol") or "").upper() in quote_symbols
+        if base_is_quote_asset and not quote_is_quote_asset and quote_attrs:
+            token, token_is_base = quote_attrs, False
         elif base_attrs:
-            token = base_attrs
+            token, token_is_base = base_attrs, True
         else:
-            token = quote_attrs
+            token, token_is_base = quote_attrs, False
         address = token.get("address") or attrs.get("address") or ""
         if not address:
             return None
@@ -62,10 +64,10 @@ class GeckoTerminalClient:
             author_id="", created_at=created_at, like_count=0, repost_count=0,
             reply_count=0, quote_count=0, source="geckoterminal", post_url=url,
             token_address=address, token_symbol=symbol, token_name=name,
-            price_usd=cls._number(attrs.get("base_token_price_usd")),
+            price_usd=cls._number(attrs.get("base_token_price_usd") if token_is_base else attrs.get("quote_token_price_usd")),
             liquidity_usd=cls._number(attrs.get("reserve_in_usd")),
             volume_24h_usd=cls._number(volume),
-            market_cap_usd=cls._number(attrs.get("market_cap_usd") or attrs.get("fdv_usd")),
+            market_cap_usd=cls._number(attrs.get("market_cap_usd")) if token_is_base else 0.0,
             buys_24h=int(cls._number(txns.get("buys"))),
             sells_24h=int(cls._number(txns.get("sells"))),
         )

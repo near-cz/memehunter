@@ -4,16 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "memehunter"
-version = "0.1.0"
-description = "Read-only Solana memecoin trend scanner with Telegram alerts"
+version = "0.2.0"
+description = "Read-only Solana memecoin trend scanner with Telegram alerts and local API"
 requires-python = ">=3.11"
-dependencies = ["httpx>=0.27,<1.0"]
+dependencies = ["httpx>=0.27,<1.0", "fastapi>=0.110,<1.0", "uvicorn[standard]>=0.27,<1.0"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 
 [project.scripts]
 memehunter = "memehunter.main:main"
+memehunter-api = "memehunter.api:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

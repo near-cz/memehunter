@@ -52,11 +52,11 @@
       setText('metric-score', opportunities.length
         ? Math.round(opportunities.reduce((sum, item) => sum + item.score, 0) / opportunities.length) + '/100' : '—');
       const status = document.querySelector('.top-actions .status');
-      if (status) status.textContent = health.status === 'ok' ? 'API locale connectée · lecture seule' : 'API indisponible';
+      if (status) status.textContent = health.status === 'ok' ? 'MemeHunter connecté · lecture seule' : 'API indisponible';
       render(document.querySelector('.filter.active')?.dataset.filter || 'all');
     } catch (_) {
       const status = document.querySelector('.top-actions .status');
-      if (status) status.textContent = 'API non connectée · démarrer memehunter-api';
+      if (status) status.textContent = 'Connexion indisponible · vérifier le service MemeHunter';
       render();
     }
   }

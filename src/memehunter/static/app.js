@@ -24,7 +24,7 @@
       'risk:unknown_liquidity': 'Liquidité indisponible',
       'risk:very_low_liquidity': 'Liquidité très faible',
       'risk:low_liquidity': 'Liquidité faible',
-      'risk:very_low_activity': 'Activité très faible',
+      'risk:very_low_activity': 'Activité très faible ou données manquantes',
       'risk:sell_pressure': 'Pression vendeuse',
       'risk:high_valuation_to_liquidity': 'Valorisation élevée par rapport à la liquidité',
       'risk:unknown_valuation_ratio': 'Ratio valorisation/liquidité inconnu',

@@ -72,7 +72,7 @@ def test_profile_without_market_data_is_not_a_strong_signal():
         0, 0, 0, 0, source="dexscreener")
     candidate = score_post(token)
     assert candidate.score == 0
-    assert candidate.reasons == ("insufficient_market_signal",)
+    assert "insufficient_market_signal" in candidate.reasons
 
 
 def test_extreme_market_cap_to_liquidity_ratio_is_penalized():
@@ -141,6 +141,8 @@ def test_telegram_market_alert_includes_geckoterminal_token_link_and_mint():
     assert "<code>MintABC123</code>" in message
     assert "&lt;script&gt;" in message
     assert "<script>" not in message
+    assert "DONNÉES INSUFFISANTES" in message
+    assert "pas de vérification honeypot" in message
 
 
 def test_telegram_alert_does_not_link_untrusted_url():

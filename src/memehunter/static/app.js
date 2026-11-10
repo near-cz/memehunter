@@ -19,6 +19,20 @@
     };
     return labels[item.risk_status] || 'Non évalué';
   }
+  function riskDescription(item) {
+    const labels = {
+      'risk:unknown_liquidity': 'Liquidité indisponible',
+      'risk:very_low_liquidity': 'Liquidité très faible',
+      'risk:low_liquidity': 'Liquidité faible',
+      'risk:very_low_activity': 'Activité très faible',
+      'risk:sell_pressure': 'Pression vendeuse',
+      'risk:high_valuation_to_liquidity': 'Valorisation élevée par rapport à la liquidité',
+      'risk:unknown_valuation_ratio': 'Ratio valorisation/liquidité inconnu',
+      'risk:no_obvious_market_flag': 'Aucun signal de risque évident dans les métriques disponibles — cela ne garantit pas la sécurité'
+    };
+    const flags = item.risk_flags || [];
+    return flags.map(flag => labels[flag] || flag).join(' · ') || 'Évaluation du risque non disponible';
+  }
   function render(filter = 'all') {
     const visible = opportunities.filter(item => {
       if (filter === 'high') return item.score >= 70;
@@ -41,6 +55,7 @@
           const risk = document.createElement('span');
           risk.className = 'risk-pill risk-' + (item.risk_status || 'unknown');
           risk.textContent = value;
+          risk.title = riskDescription(item);
           td.appendChild(risk);
         } else if (index === 4 && item.url) {
           const link = document.createElement('a');

@@ -109,3 +109,18 @@ def test_geckoterminal_selects_non_quote_token_when_base_is_sol():
     assert post.token_address == "mint456"
     assert post.token_symbol == "MEME"
     assert post.price_usd == 0.0002
+
+
+def test_geckoterminal_skips_pool_when_token_mint_metadata_is_missing():
+    payload = {
+        "data": [{
+            "id": "solana_pool789", "type": "pool",
+            "attributes": {"address": "pool789", "name": "Unknown / SOL"},
+            "relationships": {
+                "base_token": {"data": {"id": "solana_unknown", "type": "token"}},
+                "quote_token": {"data": {"id": "solana_sol", "type": "token"}},
+            },
+        }],
+        "included": [],
+    }
+    assert GeckoTerminalClient._parse_pool_response(payload, 10) == []

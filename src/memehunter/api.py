@@ -1,4 +1,5 @@
 """Read-only local API for the MemeHunter dashboard."""
+import json
 import os
 import sqlite3
 from pathlib import Path
@@ -55,6 +56,38 @@ def opportunities(limit: int = Query(default=50, ge=1, le=100)):
         return {"items": items, "total": total}
     finally:
         connection.close()
+@app.get("/api/v1/creator/drafts")
+def creator_drafts(limit: int = Query(default=20, ge=1, le=50)):
+    """Read-only list of generated creator drafts awaiting human review."""
+    connection = _connect_readonly()
+    if connection is None:
+        return {"items": [], "total": 0, "daily_limit": 5}
+    try:
+        tables = {row[0] for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        )}
+        if "creator_drafts" not in tables:
+            return {"items": [], "total": 0, "daily_limit": 5}
+        total = connection.execute("SELECT COUNT(*) FROM creator_drafts").fetchone()[0]
+        rows = connection.execute(
+            "SELECT payload, status, created_at FROM creator_drafts "
+            "ORDER BY created_at DESC LIMIT ?", (limit,)
+        ).fetchall()
+        items = []
+        for payload, status, created_at in rows:
+            item = json.loads(payload)
+            item["status"] = status
+            item["created_at"] = created_at
+            items.append(item)
+        today = connection.execute(
+            "SELECT COUNT(*) FROM creator_drafts WHERE date(created_at) = date('now')"
+        ).fetchone()[0]
+        return {"items": items, "total": total, "created_today": today, "daily_limit": 5,
+                "launch_enabled": False}
+    finally:
+        connection.close()
+
+
 def main() -> None:
     import uvicorn
     uvicorn.run(app, host=os.getenv("API_HOST", "127.0.0.1"), port=int(os.getenv("API_PORT", "8000")))

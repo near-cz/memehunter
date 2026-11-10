@@ -1,41 +1,55 @@
-"""Transparent heuristic scoring; not an investment recommendation."""
+"""Transparent heuristic scoring; never an investment recommendation."""
 from .models import Candidate, Post
-
 KEYWORDS = {
     "launch": ("launch", "launched", "fair launch", "pump.fun", "pumpfun"),
     "meme": ("meme", "memecoin", "meme coin", "ticker"),
     "momentum": ("trending", "viral", "everywhere", "community", "everyone"),
 }
-
-
 def score_post(post: Post) -> Candidate:
+    if post.source == "dexscreener":
+        return score_market_signal(post)
     text = post.text.lower()
     engagement = post.like_count + 2 * post.repost_count + post.reply_count + post.quote_count
-    score = 0
-    reasons: list[str] = []
-
+    score, reasons = 0, []
     for label, words in KEYWORDS.items():
         if any(word in text for word in words):
             score += 12
             reasons.append(f"signal:{label}")
-
     if engagement >= 1000:
-        score += 30
-        reasons.append("engagement:very_high")
+        score += 30; reasons.append("engagement:very_high")
     elif engagement >= 250:
-        score += 22
-        reasons.append("engagement:high")
+        score += 22; reasons.append("engagement:high")
     elif engagement >= 50:
-        score += 12
-        reasons.append("engagement:moderate")
+        score += 12; reasons.append("engagement:moderate")
     elif engagement >= 10:
-        score += 5
-        reasons.append("engagement:early")
-
-    # Reposts and quotes are weighted more heavily as propagation signals.
+        score += 5; reasons.append("engagement:early")
     if post.repost_count + post.quote_count >= 20:
-        score += 10
-        reasons.append("propagation:visible")
-
-    # Keep the score bounded and explicitly explain that it is heuristic.
-    return Candidate(post=post, score=min(100, score), reasons=tuple(reasons or ["weak_signal"]))
+        score += 10; reasons.append("propagation:visible")
+    return Candidate(post, min(100, score), tuple(reasons or ["weak_signal"]))
+def score_market_signal(post: Post) -> Candidate:
+    score, reasons = 0, []
+    liquidity, volume = post.liquidity_usd, post.volume_24h_usd
+    trades = post.buys_24h + post.sells_24h
+    if liquidity >= 10000:
+        score += 25; reasons.append("liquidity:strong")
+    elif liquidity >= 2000:
+        score += 15; reasons.append("liquidity:moderate")
+    elif liquidity >= 500:
+        score += 5; reasons.append("liquidity:early")
+    if volume >= 100000:
+        score += 25; reasons.append("volume:high")
+    elif volume >= 20000:
+        score += 15; reasons.append("volume:moderate")
+    elif volume >= 2000:
+        score += 5; reasons.append("volume:early")
+    if trades >= 500:
+        score += 20; reasons.append("activity:high")
+    elif trades >= 100:
+        score += 12; reasons.append("activity:moderate")
+    elif trades >= 20:
+        score += 5; reasons.append("activity:early")
+    if post.buys_24h > post.sells_24h and trades >= 20:
+        score += 10; reasons.append("flow:buys_above_sells")
+    if post.market_cap_usd > 0 and liquidity > 0 and post.market_cap_usd / liquidity > 100:
+        score -= 10; reasons.append("risk:high_fdv_to_liquidity")
+    return Candidate(post, max(0, min(100, score)), tuple(reasons or ["insufficient_market_signal"]))

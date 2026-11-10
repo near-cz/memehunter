@@ -10,6 +10,15 @@
     const node = document.getElementById(id);
     if (node) node.textContent = value;
   };
+  function riskLabel(item) {
+    const labels = {
+      high: 'Risque élevé',
+      watch: 'À surveiller',
+      unknown: 'Données insuffisantes',
+      no_obvious_flag: 'Aucun signal évident'
+    };
+    return labels[item.risk_status] || 'Non évalué';
+  }
   function render(filter = 'all') {
     const visible = opportunities.filter(item => {
       if (filter === 'high') return item.score >= 70;
@@ -25,10 +34,10 @@
       const activity = ['dexscreener', 'geckoterminal'].includes(item.source)
         ? '$' + Math.round(item.volume_24h_usd || 0).toLocaleString('en-US') + ' vol. 24h'
         : (item.likes + item.reposts + item.replies + item.quotes) + ' interactions';
-      const values = [label || 'Signal public', item.score + '/100', activity, ['dexscreener', 'geckoterminal'].includes(item.source) ? 'Voir le token' : 'Ouvrir le post'];
+      const values = [label || 'Signal public', item.score + '/100', activity, riskLabel(item), ['dexscreener', 'geckoterminal'].includes(item.source) ? 'Voir le token' : 'Ouvrir le post'];
       values.forEach((value, index) => {
         const td = document.createElement('td');
-        if (index === 3 && item.url) {
+        if (index === 3) {\n          const risk = document.createElement('span');\n          risk.className = 'risk-pill risk-' + (item.risk_status || 'unknown');\n          risk.textContent = value;\n          td.appendChild(risk);\n        } else if (index === 4 && item.url) {
           const link = document.createElement('a');
           link.href = item.url;
           link.target = '_blank';

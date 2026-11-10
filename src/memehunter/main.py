@@ -42,6 +42,8 @@ async def run() -> None:
     try:
         while True:
             try:
+                if notifier:
+                    await _deliver_pending(store, notifier)
                 posts = []
                 newest_id = None
                 if use_dex:

@@ -14,7 +14,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: SOURCE_MODE
-        value: onchain
+        value: both
       - key: DATABASE_PATH
         value: /var/data/memehunter.sqlite3
       - key: POLL_INTERVAL_SECONDS
@@ -23,6 +23,10 @@ services:
         value: "45"
       - key: MAX_TOKENS_PER_CYCLE
         value: "12"
+      - key: MAX_DAILY_LAUNCHES
+        value: "5"
+      - key: X_API_BEARER_TOKEN
+        sync: false
       - key: API_HOST
         value: 0.0.0.0
       - key: DASHBOARD_USERNAME

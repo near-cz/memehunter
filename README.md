@@ -1,30 +1,33 @@
 # MemeHunter
 
-MemeHunter is a read-only Solana memecoin discovery dashboard with optional Telegram alerts.
+MemeHunter is a Solana memecoin discovery system: public market scanning, explainable scoring, a mobile-friendly dashboard and optional Telegram alerts.
 
-## Current MVP
+## Current capabilities
 
-- **Default sources: DexScreener + GeckoTerminal public APIs**, no X account, API key, or paid X plan required.
-- DexScreener latest Solana token profiles and boosts enriched with pair data.
-- GeckoTerminal latest Solana pools plus 24-hour trending pools.
-- Explainable heuristic score based on liquidity, 24h volume, transaction activity, buy/sell balance and an FDV/liquidity risk flag.
-- Optional X API adapter; X is not required in the default configuration.
-- Optional Telegram alerts; scanner and dashboard can run without a Telegram bot.
-- SQLite persistence and deduplication; local read-only FastAPI API and dashboard.
-- No wallet connection, transaction signing, token creation, or automated trading.
+- **Default sources: DexScreener + GeckoTerminal public APIs**, no X account or paid API key required.
+- New/trending Solana pool discovery and market activity scoring.
+- Optional X API adapter.
+- Optional Telegram alerts with the token/source link.
+- SQLite persistence and deduplication.
+- Read-only operation: no wallet, transaction signing, token creation or automated trading.
+- Cloud mode runs the scanner, API and dashboard in one service so they share a persistent SQLite database.
 
-## Data-source limitations
+## Cloud hosting (recommended)
 
-Both on-chain sources are public indexers, not complete feeds of every new token or every pump.fun launch. GeckoTerminal's API is beta, data is cached, and its public rate limit is low (official docs say approximately 10 calls/minute; CoinGecko's help article updated Oct 2, 2026 says 30 calls/minute). MemeHunter uses only two GeckoTerminal requests per scan cycle and enforces a minimum 120-second polling interval. Limits can change.
+The included `render.yaml` deploys one Render web service with a persistent disk. This is deliberately one service: the scanner and API must share the same SQLite file, and a Render persistent disk cannot be mounted by multiple services simultaneously.
 
-DexScreener profile/boost feeds can over-represent promoted tokens. A pool, profile or boost is not proof of organic demand or safety. The score is a heuristic signal, not investment advice. Always verify token address, liquidity, contract and holder distribution independently.
+1. Push this repository to GitHub.
+2. In Render, choose **New → Blueprint**, connect this repository and apply the blueprint.
+3. Wait for the first deploy. Render creates a dashboard password automatically; open the service's **Environment** page to retrieve `DASHBOARD_PASSWORD`.
+4. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in the service environment if you want Telegram alerts. Never paste either secret into GitHub or this chat.
+5. Deploy the changes. Open the service URL; the browser asks for the username `admin` and the generated password.
+6. Test `/api/v1/health`, then check Telegram after a new signal qualifies.
 
-Official references:
-- https://docs.dexscreener.com/api/reference
-- https://api.geckoterminal.com/docs/index.html
-- https://support.coingecko.com/articles/6867086195-does-geckoterminal-have-an-api
+**Important:** choose a paid always-on Render web service with a persistent disk for continuous scanning and SQLite persistence. Free services may sleep and are not suitable for an always-on scanner. Hosting and disk have a cost; check Render's current pricing before confirming.
 
-## Setup
+The dashboard and API are served from the same origin, protected by HTTP Basic Auth. The scanner starts automatically with the web service and restarts when the service restarts. No computer needs to remain on.
+
+## Local development
 
 Requires Python 3.11+.
 
@@ -34,42 +37,28 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
 copy .env.example .env
-```
-
-No credentials are required for the default on-chain scanner. Edit `.env` only if you want optional Telegram or X integration. Never commit or share API keys, Telegram tokens, seed phrases or private keys.
-
-## Run locally
-
-Terminal 1 — scanner:
-
-```bash
 memehunter
 ```
 
-Terminal 2 — read-only API:
+In another terminal run `memehunter-api`, then serve `apps/dashboard` with `python -m http.server 8080 --directory apps/dashboard`. Open `http://127.0.0.1:8080`.
 
-```bash
-memehunter-api
-```
+## Configuration
 
-Terminal 3 — dashboard static server:
+- `SOURCE_MODE=onchain`: DexScreener + GeckoTerminal (default).
+- `SOURCE_MODE=dexscreener` or `geckoterminal`: one source only.
+- `SOURCE_MODE=x`: X only; requires `X_API_BEARER_TOKEN`.
+- `SOURCE_MODE=both` or `all`: on-chain sources plus X; requires X credentials.
+- Telegram activates only when both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set.
+- `POLL_INTERVAL_SECONDS` has a 120-second minimum.
 
-```bash
-python -m http.server 8080 --directory apps/dashboard
-```
+## Automation roadmap and boundaries
 
-Open http://127.0.0.1:8080. API health: http://127.0.0.1:8000/api/v1/health. API docs: http://127.0.0.1:8000/api/docs.
+**Already automatic:** scanner polling, candidate scoring, database deduplication and Telegram alert delivery (when Telegram is configured).
 
-## Source modes
+**Not implemented yet:** publishing promotional posts to X/Telegram channels, generating and publishing token artwork, creating Pump.fun tokens, trading, or managing Creator Fees. The current Telegram integration sends alerts to the configured chat; it does not publish public launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
 
-- `SOURCE_MODE=onchain` (default): DexScreener + GeckoTerminal.
-- `SOURCE_MODE=dexscreener`: DexScreener only.
-- `SOURCE_MODE=geckoterminal`: GeckoTerminal only.
-- `SOURCE_MODE=x`: X only; requires a valid local `X_API_BEARER_TOKEN`.
-- `SOURCE_MODE=both`: both on-chain sources plus X; requires X credentials.
-- `SOURCE_MODE=all`: all three sources; requires X credentials.
-- Telegram alerts activate only when both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set.
+No score guarantees safety, volume, profit or Creator Fees. Public indexers are incomplete and may contain stale or promoted data. Always verify token mint, liquidity, authority settings and holder distribution independently.
 
-## Safety
+## CI
 
-Read-only mode only. No wallet or private key is accepted. No token launch or automated trading is implemented. Never assume a token launch is free or that Creator Fees, liquidity, volume or profit are guaranteed.
+GitHub Actions runs the unit tests on pushes and pull requests to `main`.

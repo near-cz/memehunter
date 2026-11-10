@@ -1,5 +1,6 @@
 """Transparent heuristic scoring; never an investment recommendation."""
 from .models import Candidate, Post
+from .risk import market_risk_flags
 
 KEYWORDS = {
     "launch": ("launch", "launched", "fair launch", "pump.fun", "pumpfun"),
@@ -54,6 +55,14 @@ def score_market_signal(post: Post) -> Candidate:
         score += 5; reasons.append("activity:early")
     if post.buys_24h > post.sells_24h and trades >= 20:
         score += 10; reasons.append("flow:buys_above_sells")
-    if post.market_cap_usd > 0 and liquidity > 0 and post.market_cap_usd / liquidity > 100:
-        score -= 10; reasons.append("risk:high_fdv_to_liquidity")
+    flags = market_risk_flags(post)
+    if "risk:high_fdv_to_liquidity" in flags:
+        score -= 10
+    if "risk:very_low_liquidity" in flags:
+        score -= 15
+    elif "risk:low_liquidity" in flags:
+        score -= 8
+    if "risk:sell_pressure" in flags:
+        score -= 12
+    reasons.extend(flags)
     return Candidate(post, max(0, min(100, score)), tuple(reasons or ["insufficient_market_signal"]))

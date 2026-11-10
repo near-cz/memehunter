@@ -7,7 +7,7 @@ MemeHunter is a Solana memecoin discovery system: public market scanning, explai
 - **Default sources: DexScreener + GeckoTerminal public APIs**, no X account or paid API key required.
 - New/trending Solana pool discovery and market activity scoring.
 
-- **Market-risk flags:** highlights very low/low liquidity, very low activity, sell pressure and unusually high market-cap-to-liquidity ratios. Missing market fields are labelled unknown rather than safe. These are screening heuristics, not honeypot, holder, mint-authority or freeze-authority checks.
+- **Market-risk flags:** highlights very low/low liquidity, very low activity, sell pressure and unusually high valuation-to-liquidity ratios. Missing market fields are labelled unknown rather than safe. These are screening heuristics, not honeypot, holder, mint-authority or freeze-authority checks.
 - Optional X API adapter.
 - Optional Telegram alerts with the token/source link.
 - SQLite persistence and deduplication.

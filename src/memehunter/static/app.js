@@ -25,7 +25,7 @@
       const activity = ['dexscreener', 'geckoterminal'].includes(item.source)
         ? '$' + Math.round(item.volume_24h_usd || 0).toLocaleString('en-US') + ' vol. 24h'
         : (item.likes + item.reposts + item.replies + item.quotes) + ' interactions';
-      const values = [label || 'Signal public', item.score + '/100', activity, item.source === 'dexscreener' ? 'Voir le token' : 'Ouvrir le post'];
+      const values = [label || 'Signal public', item.score + '/100', activity, ['dexscreener', 'geckoterminal'].includes(item.source) ? 'Voir le token' : 'Ouvrir le post'];
       values.forEach((value, index) => {
         const td = document.createElement('td');
         if (index === 3 && item.url) {

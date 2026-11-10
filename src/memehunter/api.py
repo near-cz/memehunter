@@ -20,7 +20,7 @@ def health():
     path = Path(_database_path())
     return {"status": "ok", "database": "ready" if path.exists() else "waiting_for_scanner",
             "mode": "read-only", "token_launch_enabled": False, "x_required": False,
-            "default_source": os.getenv("SOURCE_MODE", "dexscreener")}
+            "default_source": os.getenv("SOURCE_MODE", "onchain")}
 @app.get("/api/v1/opportunities")
 def opportunities(limit: int = Query(default=50, ge=1, le=100)):
     connection = _connect_readonly()

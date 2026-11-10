@@ -58,7 +58,7 @@ def score_market_signal(post: Post) -> Candidate:
     if not reasons:
         reasons.append("insufficient_market_signal")
     flags = market_risk_flags(post)
-    if "risk:high_fdv_to_liquidity" in flags:
+    if "risk:high_valuation_to_liquidity" in flags:
         score -= 10
     if "risk:very_low_liquidity" in flags:
         score -= 15

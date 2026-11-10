@@ -15,6 +15,12 @@ class Store:
             post_id TEXT PRIMARY KEY, score INTEGER NOT NULL, created_at TEXT NOT NULL
         )""")
         self.db.execute("CREATE TABLE IF NOT EXISTS app_state (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+        self.db.execute("""CREATE TABLE IF NOT EXISTS creator_drafts (
+            source_post_id TEXT PRIMARY KEY,
+            payload TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending_review',
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )""")
         self.db.execute("""CREATE TABLE IF NOT EXISTS notifications (
             post_id TEXT PRIMARY KEY,
             payload TEXT NOT NULL,
@@ -54,6 +60,24 @@ class Store:
         }, ensure_ascii=False)
         cursor = self.db.execute(
             "INSERT OR IGNORE INTO notifications(post_id, payload) VALUES (?, ?)",
+            (candidate.post.post_id, payload),
+        )
+        self.db.commit()
+        return cursor.rowcount == 1
+
+    def enqueue_creator_draft(self, candidate: Candidate, daily_limit: int = 5) -> bool:
+        """Create at most daily_limit X-origin draft cards per UTC day; never launches."""
+        if candidate.post.source != "x":
+            return False
+        from .creator import build_creator_draft
+        count = self.db.execute(
+            "SELECT COUNT(*) FROM creator_drafts WHERE date(created_at) = date('now')"
+        ).fetchone()[0]
+        if count >= max(0, daily_limit):
+            return False
+        payload = json.dumps(build_creator_draft(candidate), ensure_ascii=False)
+        cursor = self.db.execute(
+            "INSERT OR IGNORE INTO creator_drafts(source_post_id, payload) VALUES (?, ?)",
             (candidate.post.post_id, payload),
         )
         self.db.commit()

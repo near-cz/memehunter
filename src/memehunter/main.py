@@ -28,9 +28,10 @@ async def run() -> None:
                     posts.extend(x_posts)
                     store.set_cursor(newest_id)
                 for post in posts:
+                    is_new = store.is_new(post.post_id)
                     candidate = score_post(post)
                     store.mark_seen(candidate)
-                    if candidate.score >= settings.min_score and notifier:
+                    if is_new and candidate.score >= settings.min_score and notifier:
                         await notifier.send_candidate(candidate)
                         log.info("Alert sent for %s item %s (score=%s)", post.source, post.post_id, candidate.score)
                 log.info("Cycle complete: %s public signals", len(posts))

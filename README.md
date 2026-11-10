@@ -19,14 +19,14 @@ The included `render.yaml` deploys one Render web service with a persistent disk
 
 1. Push this repository to GitHub.
 2. In Render, choose **New → Blueprint**, connect this repository and apply the blueprint.
-3. Wait for the first deploy. Render creates a dashboard password automatically; open the service's **Environment** page to retrieve `DASHBOARD_PASSWORD`.
+3. Before the first deploy, open the service's **Environment** page and set `DASHBOARD_USERNAME=admin` and `DASHBOARD_PASSWORD` to your chosen secret. The password is stored as a server-side environment variable, never in the HTML or Git.
 4. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in the service environment if you want Telegram alerts. Never paste either secret into GitHub or this chat.
 5. Deploy the changes. Open the service URL; the browser asks for the username `admin` and the generated password.
-6. Test `/api/v1/health`, then check Telegram after a new signal qualifies.
+6. Test `/api/v1/health`, then check Telegram after a new signal qualifies. If the dashboard credentials are missing, cloud mode fails closed with HTTP 503 instead of exposing the dashboard.
 
 **Important:** choose a paid always-on Render web service with a persistent disk for continuous scanning and SQLite persistence. Free services may sleep and are not suitable for an always-on scanner. Hosting and disk have a cost; check Render's current pricing before confirming.
 
-The dashboard and API are served from the same origin, protected by HTTP Basic Auth. The scanner starts automatically with the web service and restarts when the service restarts. No computer needs to remain on.
+The dashboard and API are served from the same origin, protected by HTTP Basic Auth. Configure `DASHBOARD_PASSWORD` in Render's Environment settings; do not hardcode it in HTML, JavaScript, or a committed file. The scanner starts automatically with the web service and restarts when the service restarts. No computer needs to remain on.
 
 ## Local development
 

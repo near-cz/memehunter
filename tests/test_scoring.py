@@ -82,3 +82,30 @@ def test_extreme_market_cap_to_liquidity_ratio_is_penalized():
     candidate = score_post(token)
     assert "risk:high_fdv_to_liquidity" in candidate.reasons
     assert candidate.score < 50
+
+
+def test_geckoterminal_selects_non_quote_token_when_base_is_sol():
+    payload = {
+        "data": [{
+            "id": "solana_pool456", "type": "pool",
+            "attributes": {"address": "pool456", "name": "SOL / MEME",
+                "base_token_price_usd": "150", "quote_token_price_usd": "0.0002",
+                "reserve_in_usd": "9000", "volume_usd": {"h24": "40000"},
+                "transactions": {"h24": {"buys": 120, "sells": 40}}},
+            "relationships": {
+                "base_token": {"data": {"id": "solana_sol", "type": "token"}},
+                "quote_token": {"data": {"id": "solana_meme", "type": "token"}},
+            },
+        }],
+        "included": [
+            {"id": "solana_sol", "type": "token", "attributes": {
+                "address": "So11111111111111111111111111111111111111112",
+                "name": "Wrapped SOL", "symbol": "SOL"}},
+            {"id": "solana_meme", "type": "token", "attributes": {
+                "address": "mint456", "name": "Meme Coin", "symbol": "MEME"}},
+        ],
+    }
+    post = GeckoTerminalClient._parse_pool_response(payload, 10)[0]
+    assert post.token_address == "mint456"
+    assert post.token_symbol == "MEME"
+    assert post.price_usd == 0.0002

@@ -46,7 +46,8 @@ class GeckoTerminalClient:
             token, token_is_base = base_attrs, True
         else:
             token, token_is_base = quote_attrs, False
-        address = token.get("address") or attrs.get("address") or ""
+        # Never substitute a pool address for a token mint: that would mislabel the asset.
+        address = token.get("address") or ""
         if not address:
             return None
         txns = (attrs.get("transactions") or {}).get("h24") or {}

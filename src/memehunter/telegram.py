@@ -50,7 +50,7 @@ class TelegramNotifier:
 
         parsed = urlparse(post.url)
         safe_url = post.url if parsed.scheme == "https" and parsed.netloc in {
-            "dexscreener.com", "www.geckoterminal.com", "geckoterminal.com", "x.com", "twitter.com"
+            "dexscreener.com", "www.geckoterminal.com", "geckoterminal.com", "x.com", "twitter.com", "bsky.app"
         } else ""
         link = f'<a href="{html.escape(safe_url, quote=True)}">{source_label}</a>' if safe_url else source_label
         disclaimer = ("Analyse limitée aux données marché publiques ; pas de vérification honeypot, holders, mint/freeze authority ni garantie de sécurité." if is_market else "Signal social exploratoire ; aucune vérification on-chain ou de sécurité n’est effectuée.")

@@ -19,8 +19,8 @@ Creator & Publisher is a first-class product pillar beside MemeHunter's discover
 
 ### Phase A — Creator workspace (partially implemented; no wallet required)
 - [x] Add a dedicated Creator Studio area to the dashboard.
-- [x] Generate review-only concept drafts from qualifying new X posts: suggested name, ticker, neutral description, score and source link.
-- [x] Request X photo-media expansions and preview up to four source-tweet photos in Creator Studio when available.
+- [x] Generate review-only concept drafts from qualifying new Bluesky posts (X only when explicitly enabled): suggested name, ticker, neutral description, score and source link.
+- [x] Preview up to four public post photos in Creator Studio when available (Bluesky by default; X only when explicitly enabled).
 - [x] Persist drafts in SQLite and expose a read-only API endpoint.
 - [x] Enforce a maximum of five new draft records per UTC day (configurable from zero to five).
 - [ ] Add editable draft fields, image upload/generation, metadata validation and a launch checklist.
@@ -59,7 +59,7 @@ Creator & Publisher is a first-class product pillar beside MemeHunter's discover
 
 ## Current implementation boundary
 
-The current Creator Studio queue is a research/drafting aid only. It previews photo URLs returned by X (it does not download, host or grant reuse rights to them), does not generate artwork or create metadata uploads, connect a wallet, build or sign transactions, create tokens, publish posts, or calculate Creator Fees. X scanning requires a valid X API bearer token; without it, the on-chain scanner remains active and X polling is paused.
+The current Creator Studio queue is a research/drafting aid only. It previews public photo URLs returned by Bluesky or X (it does not download, host or grant reuse rights to them), does not generate artwork or create metadata uploads, connect a wallet, build or sign transactions, create tokens, publish posts, or calculate Creator Fees. Bluesky public search is the default social source and does not require a key. X scanning is disabled by default and requires explicit opt-in plus a paid X API bearer token.
 
 ## Pump.fun integration note (verified 10 November 2026)
 

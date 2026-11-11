@@ -7,6 +7,7 @@ from .scoring import score_post
 from .sources.dexscreener import DexScreenerClient
 from .sources.geckoterminal import GeckoTerminalClient
 from .sources.x_api import XApiClient
+from .sources.bluesky import BlueskyClient
 from .storage import Store
 from .telegram import TelegramNotifier
 
@@ -33,13 +34,15 @@ async def run() -> None:
     notifier = TelegramNotifier(settings.telegram_bot_token, settings.telegram_chat_id) if settings.telegram_bot_token else None
     dex = DexScreenerClient(max_tokens=settings.max_tokens_per_cycle)
     gecko = GeckoTerminalClient(max_pools=settings.max_tokens_per_cycle)
-    x_source = XApiClient(settings.x_api_bearer_token) if settings.x_api_bearer_token else None
+    x_source = XApiClient(settings.x_api_bearer_token) if settings.enable_x_api and settings.x_api_bearer_token else None
+    bluesky_source = BlueskyClient()
     modes = settings.source_mode
     use_dex = modes in {"dexscreener", "onchain", "both", "all"}
     use_gecko = modes in {"geckoterminal", "onchain", "both", "all"}
+    use_bluesky = modes in {"bluesky", "both", "all"}
     use_x = modes in {"x", "both", "all"} and x_source is not None
-    if modes in {"x", "both", "all"} and x_source is None:
-        log.warning("X scanning is enabled in SOURCE_MODE but X_API_BEARER_TOKEN is not configured; X polling is paused")
+    if modes in {"x", "both", "all"} and settings.enable_x_api and x_source is None:
+        log.warning("ENABLE_X_API is true but X_API_BEARER_TOKEN is missing; X polling is paused")
     log.info("MemeHunter scanner started (read-only; source_mode=%s)", modes)
     try:
         while True:
@@ -58,6 +61,11 @@ async def run() -> None:
                         posts.extend(await gecko.discover())
                     except Exception as exc:
                         log.warning("GeckoTerminal unavailable: %s", type(exc).__name__)
+                if use_bluesky:
+                    try:
+                        posts.extend(await bluesky_source.search(settings.bluesky_search_query, max_results=settings.max_tokens_per_cycle * 4))
+                    except Exception as exc:
+                        log.warning("Bluesky search unavailable: %s", type(exc).__name__)
                 if use_x and x_source:
                     try:
                         x_posts, newest_id = await x_source.search(settings.search_query, since_id=store.get_cursor())
@@ -68,7 +76,7 @@ async def run() -> None:
                     is_new = store.is_new(post.post_id)
                     candidate = score_post(post)
                     if is_new and candidate.score >= settings.min_score:
-                        if post.source == "x":
+                        if post.source in {"x", "bluesky"}:
                             store.enqueue_creator_draft(candidate, settings.max_daily_launches)
                         if notifier:
                             store.enqueue_notification(candidate)

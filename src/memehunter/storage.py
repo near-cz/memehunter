@@ -66,8 +66,8 @@ class Store:
         return cursor.rowcount == 1
 
     def enqueue_creator_draft(self, candidate: Candidate, daily_limit: int = 5) -> bool:
-        """Create at most daily_limit X-origin draft cards per UTC day; never launches."""
-        if candidate.post.source != "x":
+        """Create at most daily_limit social-origin draft cards per UTC day; never launches."""
+        if candidate.post.source not in {"x", "bluesky"}:
             return False
         from .creator import build_creator_draft
         count = self.db.execute(

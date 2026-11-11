@@ -25,6 +25,10 @@ services:
         value: "12"
       - key: MAX_DAILY_LAUNCHES
         value: "5"
+      - key: BLUESKY_SEARCH_QUERY
+        value: meme OR memecoin OR viral OR trending
+      - key: ENABLE_X_API
+        value: "false"
       - key: X_API_BEARER_TOKEN
         sync: false
       - key: API_HOST

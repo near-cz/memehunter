@@ -39,3 +39,18 @@ def test_creator_queue_ignores_non_x_posts(tmp_path):
                 0, 0, 0, 0, source="dexscreener")
     assert store.enqueue_creator_draft(Candidate(post, 90, ("volume:high",))) is False
     store.close()
+
+def test_creator_draft_uses_tweet_photo_when_available():
+    candidate = _candidate("456")
+    post = Post(
+        candidate.post.post_id, candidate.post.text, candidate.post.author_id,
+        candidate.post.created_at, candidate.post.like_count, candidate.post.repost_count,
+        candidate.post.reply_count, candidate.post.quote_count,
+        media_urls=("https://pbs.twimg.com/media/example.jpg",),
+        media_alt_texts=("A smiling cartoon cat",),
+        source="x", post_url=candidate.post.url,
+    )
+    draft = build_creator_draft(Candidate(post, 91, ("engagement:high",)))
+    assert draft["image_urls"] == ["https://pbs.twimg.com/media/example.jpg"]
+    assert draft["image_alt_texts"] == ["A smiling cartoon cat"]
+    assert draft["image_status"] == "source_image_available"

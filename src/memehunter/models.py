@@ -10,6 +10,8 @@ class Post:
     repost_count: int
     reply_count: int
     quote_count: int
+    media_urls: tuple[str, ...] = ()
+    media_alt_texts: tuple[str, ...] = ()
     source: str = "x"
     post_url: str = ""
     token_address: str = ""

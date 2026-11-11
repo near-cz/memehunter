@@ -13,7 +13,9 @@ class XApiClient:
         params: dict[str, str | int] = {
             "query": query,
             "max_results": min(100, max(10, max_results)),
-            "tweet.fields": "created_at,author_id,public_metrics",
+            "tweet.fields": "created_at,author_id,public_metrics,attachments",
+            "expansions": "attachments.media_keys",
+            "media.fields": "media_key,type,url,preview_image_url,alt_text",
         }
         if since_id:
             params["since_id"] = since_id
@@ -22,11 +24,25 @@ class XApiClient:
             response.raise_for_status()
             payload = response.json()
 
+        media_by_key = {
+            media.get("media_key"): media
+            for media in payload.get("includes", {}).get("media", [])
+        }
         posts: list[Post] = []
         for item in payload.get("data", []):
             metrics = item.get("public_metrics", {})
+            media_urls: list[str] = []
+            media_alt_texts: list[str] = []
+            for media_key in item.get("attachments", {}).get("media_keys", []):
+                media = media_by_key.get(media_key, {})
+                # Only use actual image URLs; video previews are not token artwork.
+                if media.get("type") == "photo" and media.get("url", "").startswith("https://"):
+                    media_urls.append(media["url"])
+                    media_alt_texts.append(media.get("alt_text", ""))
             posts.append(Post(
                 post_id=str(item["id"]),
+                media_urls=tuple(media_urls),
+                media_alt_texts=tuple(media_alt_texts),
                 text=item.get("text", ""),
                 author_id=str(item.get("author_id", "")),
                 created_at=item.get("created_at", ""),

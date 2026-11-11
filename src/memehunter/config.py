@@ -26,7 +26,7 @@ class Settings:
     search_query: str = '(meme OR viral OR trending OR funny OR community) lang:en -is:retweet -is:reply'
     bluesky_search_query: str = "meme OR memecoin OR viral OR trending"
     enable_x_api: bool = False
-    source_mode: str = "onchain"
+    source_mode: str = "both"
     max_tokens_per_cycle: int = 12
     max_daily_launches: int = 5
 
@@ -43,7 +43,7 @@ class Settings:
             search_query=os.getenv("X_SEARCH_QUERY", cls.search_query),
             bluesky_search_query=os.getenv("BLUESKY_SEARCH_QUERY", cls.bluesky_search_query),
             enable_x_api=os.getenv("ENABLE_X_API", "false").lower() in {"1", "true", "yes"},
-            source_mode=os.getenv("SOURCE_MODE", "onchain").lower(),
+            source_mode=os.getenv("SOURCE_MODE", "both").lower(),
             max_tokens_per_cycle=max(1, min(20, int(os.getenv("MAX_TOKENS_PER_CYCLE", "12")))),
             max_daily_launches=max(0, min(5, int(os.getenv("MAX_DAILY_LAUNCHES", "5")))),
         )

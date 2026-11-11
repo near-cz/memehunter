@@ -15,7 +15,7 @@ Creator & Publisher is not implemented yet; the current application remains read
 - New/trending Solana pool discovery and market activity scoring.
 - **Market-risk flags:** highlights very low/low liquidity, very low activity, sell pressure and unusually high valuation-to-liquidity ratios. Missing market fields are labelled unknown rather than safe. These are screening heuristics, not honeypot, holder, mint-authority or freeze-authority checks.
 - Optional X API v2 scanning; the cloud blueprint enables the combined mode and pauses X polling until a bearer token is configured.
-- **Creator Studio draft queue:** qualifying new X signals can produce a concept name, ticker, review description and source link. The queue is capped at five drafts per UTC day.
+- **Creator Studio draft queue:** qualifying new X signals can produce a concept name, ticker, review description, source link and up to four source-tweet photo previews (when X returns photo media). The queue is capped at five drafts per UTC day.
 - Optional Telegram alerts with the token/source link.
 - SQLite persistence and deduplication.
 - Read-only launch workflow: Creator Studio drafts are review-only. No wallet custody, transaction signing, token creation or automated trading.
@@ -64,7 +64,7 @@ In another terminal run `memehunter-api`, then serve `apps/dashboard` with `pyth
 
 **Already automatic:** scanner polling, candidate scoring, database deduplication, Telegram alert delivery (when Telegram is configured), and creation of up to five review-only Creator Studio drafts per UTC day from qualifying new X posts (when X API access is configured).
 
-**Not implemented yet:** image generation/artwork upload, full promotional launch campaigns, publishing to X, Pump.fun transaction construction/submission, token creation, trading, or Creator Fee accounting. Telegram signal alerts can be delivered to a private chat or posted directly into a channel where the bot is an administrator; they are scanner alerts, not automatic token-launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
+**Not implemented yet:** image generation/artwork upload (tweet photo preview is supported, but reuse rights must be reviewed), full promotional launch campaigns, publishing to X, Pump.fun transaction construction/submission, token creation, trading, or Creator Fee accounting. Telegram signal alerts can be delivered to a private chat or posted directly into a channel where the bot is an administrator; they are scanner alerts, not automatic token-launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
 
 No score guarantees safety, volume, profit or Creator Fees. Public indexers are incomplete and may contain stale or promoted data. Always verify token mint, liquidity, authority settings and holder distribution independently.
 

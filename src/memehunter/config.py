@@ -24,6 +24,8 @@ class Settings:
     min_score: int = 45
     database_path: str = "data/memehunter.sqlite3"
     search_query: str = '(meme OR viral OR trending OR funny OR community) lang:en -is:retweet -is:reply'
+    bluesky_search_query: str = "meme OR memecoin OR viral OR trending"
+    enable_x_api: bool = False
     source_mode: str = "onchain"
     max_tokens_per_cycle: int = 12
     max_daily_launches: int = 5
@@ -39,14 +41,16 @@ class Settings:
             min_score=min(100, max(0, int(os.getenv("MIN_OPPORTUNITY_SCORE", "45")))),
             database_path=os.getenv("DATABASE_PATH", "data/memehunter.sqlite3"),
             search_query=os.getenv("X_SEARCH_QUERY", cls.search_query),
+            bluesky_search_query=os.getenv("BLUESKY_SEARCH_QUERY", cls.bluesky_search_query),
+            enable_x_api=os.getenv("ENABLE_X_API", "false").lower() in {"1", "true", "yes"},
             source_mode=os.getenv("SOURCE_MODE", "onchain").lower(),
             max_tokens_per_cycle=max(1, min(20, int(os.getenv("MAX_TOKENS_PER_CYCLE", "12")))),
             max_daily_launches=max(0, min(5, int(os.getenv("MAX_DAILY_LAUNCHES", "5")))),
         )
 
     def validate(self) -> None:
-        allowed = {"dexscreener", "geckoterminal", "onchain", "x", "both", "all"}
+        allowed = {"dexscreener", "geckoterminal", "onchain", "bluesky", "x", "both", "all"}
         if self.source_mode not in allowed:
-            raise RuntimeError("SOURCE_MODE must be dexscreener, geckoterminal, onchain, x, both, or all")
+            raise RuntimeError("SOURCE_MODE must be dexscreener, geckoterminal, onchain, bluesky, x, both, or all")
         if bool(self.telegram_bot_token) != bool(self.telegram_chat_id):
             raise RuntimeError("Set both Telegram variables or leave both empty")

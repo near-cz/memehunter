@@ -76,7 +76,7 @@
     draftGrid.replaceChildren();
     draftEmpty.hidden = items.length > 0;
     if (!items.length) {
-      draftEmpty.textContent = 'Aucune fiche pour le moment. Configure l’accès X pour commencer la détection.';
+      draftEmpty.textContent = 'Aucune fiche pour le moment. MemeHunter cherche les posts publics sur Bluesky.';
       return;
     }
     for (const item of items) {
@@ -92,13 +92,13 @@
       const imageUrls = Array.isArray(item.image_urls) ? item.image_urls : [];
       const altTexts = Array.isArray(item.image_alt_texts) ? item.image_alt_texts : [];
       const safeImages = imageUrls.filter(url => {
-        try { const parsed = new URL(url); return parsed.protocol === 'https:' && parsed.hostname === 'pbs.twimg.com'; }
+        try { const parsed = new URL(url); return parsed.protocol === 'https:' && ['pbs.twimg.com', 'cdn.bsky.app'].includes(parsed.hostname); }
         catch (_) { return false; }
       });
       if (safeImages.length) {
         safeImages.slice(0, 4).forEach((url, index) => {
           const image = document.createElement('img');
-          image.src = url; image.alt = altTexts[index] || 'Image issue du post X source';
+          image.src = url; image.alt = altTexts[index] || 'Image du post social source';
           image.loading = 'lazy'; image.referrerPolicy = 'no-referrer';
           artwork.append(image);
         });
@@ -132,7 +132,7 @@
         ? Math.round(opportunities.reduce((sum, item) => sum + item.score, 0) / opportunities.length) + '/100' : '—');
       const status = document.querySelector('.top-actions .status');
       if (status) status.textContent = health.status === 'ok'
-        ? (health.x_configured ? 'MemeHunter connecté · X configuré' : 'MemeHunter connecté · X à configurer')
+        ? 'MemeHunter connecté · Bluesky + on-chain'
         : 'API indisponible';
       render(document.querySelector('.filter.active')?.dataset.filter || 'all');
       renderDrafts(drafts);

@@ -1,4 +1,4 @@
-"Read-only adapter for public Bluesky search; no account or API key required."""
+"""Read-only adapter for public Bluesky search; no account or API key required."""
 from urllib.parse import quote
 import httpx
 from ..models import Post

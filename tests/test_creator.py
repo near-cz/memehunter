@@ -33,6 +33,15 @@ def test_creator_queue_is_idempotent_and_capped_at_five_per_day(tmp_path):
     store.close()
 
 
+def test_creator_queue_accepts_bluesky_posts(tmp_path):
+    store = Store(str(tmp_path / "memehunter.sqlite3"))
+    post = Post("bsky:post1", "This #MoonCat meme is trending", "", "2026-11-11T10:00:00Z",
+                30, 10, 2, 1, source="bluesky",
+                post_url="https://bsky.app/profile/example.bsky.social/post/post1")
+    assert store.enqueue_creator_draft(Candidate(post, 90, ("engagement:high",))) is True
+    store.close()
+
+
 def test_creator_queue_ignores_non_x_posts(tmp_path):
     store = Store(str(tmp_path / "memehunter.sqlite3"))
     post = Post("dex:mint", "Token", "", "2026-11-10T10:00:00Z",

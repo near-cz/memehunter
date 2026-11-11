@@ -53,7 +53,7 @@ In another terminal run `memehunter-api`, then serve `apps/dashboard` with `pyth
 
 ## Configuration
 
-- `SOURCE_MODE=onchain`: DexScreener + GeckoTerminal (default).
+- `SOURCE_MODE=both`: DexScreener + GeckoTerminal + Bluesky (default).
 - `SOURCE_MODE=dexscreener` or `geckoterminal`: one source only.
 - `SOURCE_MODE=bluesky`: Bluesky social discovery only.
 - `SOURCE_MODE=x`: X only, and only with `ENABLE_X_API=true` plus a paid X bearer token.
@@ -65,7 +65,7 @@ In another terminal run `memehunter-api`, then serve `apps/dashboard` with `pyth
 
 **Already automatic:** scanner polling, candidate scoring, database deduplication, Telegram alert delivery (when Telegram is configured), and creation of up to five review-only Creator Studio drafts per UTC day from qualifying new public Bluesky posts (and X posts only when paid X access is explicitly enabled).
 
-**Not implemented yet:** image generation/artwork upload (tweet photo preview is supported, but reuse rights must be reviewed), full promotional launch campaigns, publishing to X, Pump.fun transaction construction/submission, token creation, trading, or Creator Fee accounting. Telegram signal alerts can be delivered to a private chat or posted directly into a channel where the bot is an administrator; they are scanner alerts, not automatic token-launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
+**Not implemented yet:** image generation/artwork upload (public Bluesky/X photo previews are supported, but reuse rights must be reviewed), full promotional launch campaigns, publishing to X, Pump.fun transaction construction/submission, token creation, trading, or Creator Fee accounting. Telegram signal alerts can be delivered to a private chat or posted directly into a channel where the bot is an administrator; they are scanner alerts, not automatic token-launch announcements. Pump.fun launch automation must wait for verified official interfaces, fee/terms review, explicit user approval and secure wallet signing. No seed phrase or private key should ever be entered into MemeHunter's dashboard or this chat.
 
 No score guarantees safety, volume, profit or Creator Fees. Public indexers are incomplete and may contain stale or promoted data. Always verify token mint, liquidity, authority settings and holder distribution independently.
 

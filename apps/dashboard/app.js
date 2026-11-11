@@ -88,13 +88,32 @@
       top.append(score, status);
       const title = document.createElement('h4'); title.textContent = item.name || 'Concept sans nom';
       const ticker = document.createElement('div'); ticker.className = 'creator-ticker'; ticker.textContent = '$' + (item.symbol || 'TBD');
+      const artwork = document.createElement('div'); artwork.className = 'creator-artwork';
+      const imageUrls = Array.isArray(item.image_urls) ? item.image_urls : [];
+      const altTexts = Array.isArray(item.image_alt_texts) ? item.image_alt_texts : [];
+      const safeImages = imageUrls.filter(url => {
+        try { const parsed = new URL(url); return parsed.protocol === 'https:' && parsed.hostname === 'pbs.twimg.com'; }
+        catch (_) { return false; }
+      });
+      if (safeImages.length) {
+        safeImages.slice(0, 4).forEach((url, index) => {
+          const image = document.createElement('img');
+          image.src = url; image.alt = altTexts[index] || 'Image issue du post X source';
+          image.loading = 'lazy'; image.referrerPolicy = 'no-referrer';
+          artwork.append(image);
+        });
+      } else {
+        const placeholder = document.createElement('span');
+        placeholder.textContent = 'Aucune image dans le post · logo à générer';
+        artwork.append(placeholder);
+      }
       const description = document.createElement('p'); description.textContent = item.description || 'Description à compléter.';
       const source = document.createElement('a'); source.href = item.source_url || '#'; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = 'Voir le post source ↗';
       const footer = document.createElement('div'); footer.className = 'creator-card-footer';
       const art = document.createElement('span'); art.textContent = 'Visuel à préparer';
       const launch = document.createElement('span'); launch.textContent = 'Aucun lancement';
       footer.append(art, launch);
-      card.append(top, title, ticker, description, source, footer);
+      card.append(top, artwork, title, ticker, description, source, footer);
       draftGrid.append(card);
     }
   }
